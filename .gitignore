@@ -30,8 +30,3 @@
 *.exe
 *.out
 *.app
-
-#Visual Studio Code config files
-c_cpp_properties.json
-launch.json
-tasks.json
