@@ -1,29 +1,29 @@
 {
     "version": "2.0.0",
     "tasks": [
-      {
-        "type": "shell",
-        "label": "C/C++: g++.exe build active file",
-        "command": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe",
-        "args": [
-            "-g",
-            "${workspaceFolder}/src/main.cpp",
-            "-o",
-            "${workspaceFolder}/bin/main.exe",
-            "-IF:\\Programme\\Vulkan\\1.2.176.1\\Include",
-            "-LF:\\Programme\\Vulkan\\1.2.176.1\\Lib",
-            "-lvulkan-1"
-        ],
-        "options": {
-          "cwd": "${workspaceFolder}"
-        },
-        "problemMatcher": [
-            "$gcc"
-        ],
-        "group": {
-          "kind": "build",
-          "isDefault": true
+        {
+            "type": "shell",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-g",
+                "${workspaceFolder}/src/main.cpp",
+                "-o",
+                "${workspaceFolder}/bin/main.exe",
+                "-IF:\\Programme\\Vulkan\\1.2.176.1\\Include",
+                "-LF:\\Programme\\Vulkan\\1.2.176.1\\Lib",
+                "-lvulkan-1"
+            ],  
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
-      }
     ]
-  }
+}
