@@ -3,14 +3,16 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "C/C++: g++.exe build active file",
-            "command": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\mingw32-make.exe",
+            "label": "Make debugging build!",
+            "windows": {
+                "command": "mingw32-make"
+            },
+            "linux": {
+                "command": "make"
+            },
             "args": [
                 "DebuggingBuild"
-            ],  
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
+            ],
             "problemMatcher": [
                 "$gcc"
             ],
@@ -18,6 +20,22 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "Make release build!",
+            "windows": {
+                "command": "mingw32-make"
+            },
+            "linux": {
+                "command": "make"
+            },
+            "args": [
+                "ReleaseBuild"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
         }
     ]
 }
