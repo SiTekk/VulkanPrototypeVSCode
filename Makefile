@@ -1,12 +1,12 @@
-CompilerPath = C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\g++.exe
+CompilerPath = /usr/bin/g++
 CompilerFlags = -std=c++17
 CompilerRealeaseFlags= -O3
-VulkanLibPath = -LF:\Programme\Vulkan\1.2.176.1\Lib
-VulkanIncludePath = -IF:\Programme\Vulkan\1.2.176.1\Include
-LinkerFLags = -lvulkan-1
+VulkanLibPath = -L/home/simon/test/Vulkan/1.2.176.1/x86_64/lib
+VulkanIncludePath = -I/home/simon/test/Vulkan/1.2.176.1/x86_64/include
+LinkerFLags = -lvulkan
 SourceCode = $(wildcard src/*.cpp)
-Executable = F:\Programme\VulkanPrototype\bin\main.exe
-ReleaseExecutable = F:\Programme\VulkanPrototype\release.exe
+Executable = /home/simon/test/VulkanPrototype/bin/main.out
+ReleaseExecutable = /home/simon/test/VulkanPrototype/release.out
 
 DebuggingBuild:
 	$(CompilerPath) -g $(CompilerFlags) $(SourceCode) -o $(Executable) $(VulkanIncludePath) $(VulkanLibPath) $(LinkerFLags)

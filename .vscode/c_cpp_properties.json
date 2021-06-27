@@ -20,12 +20,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/simon/test/Vulkan/1.2.176.1/Include"
+                "/home/simon/test/Vulkan/1.2.176.1/x86_64/include"
             ],
             "defines": [
                 "_DEBUG"
             ],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "gnu17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"
