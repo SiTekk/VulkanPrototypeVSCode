@@ -1,20 +1,41 @@
 #include <iostream>
 #include "vulkan/vulkan.h"
 
-#define VULKANPROTOTYPE_VERSION VK_MAKE_VERSION(0,1,0)
+#define VULKANPROTOTYPE_VERSION VK_MAKE_VERSION(0, 1, 0)
 
 namespace VulkanPrototype
 {
-    
+
     VkInstance instance;
 
     void EvaluteVulkanResult(VkResult result)
     {
-        if(result != VK_SUCCESS)
+        if (result != VK_SUCCESS)
             __debugbreak();
     }
 
-    int main(int argc, char *argv[]) 
+    void printStats(VkPhysicalDevice *device)
+    {
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(*device, &properties);
+        std::cout << "API Version: " << VK_VERSION_MAJOR(properties.apiVersion) << "." << VK_VERSION_MINOR(properties.apiVersion) << "." << VK_VERSION_PATCH(properties.apiVersion) << std::endl;
+        std::cout << "Driver Version: " << VK_VERSION_MAJOR(properties.driverVersion) << "." << VK_VERSION_MINOR(properties.driverVersion) << "." << VK_VERSION_PATCH(properties.driverVersion) << std::endl;
+        std::cout << "Vendor ID: " << properties.vendorID << std::endl;
+        std::cout << "Device ID: " << properties.deviceID << std::endl;
+        std::cout << "Device Type: " << properties.deviceType << std::endl;
+        std::cout << "Device Name: " << properties.deviceName << std::endl;
+
+        VkPhysicalDeviceFeatures features;
+        vkGetPhysicalDeviceFeatures(*device, &features);
+        std::cout << features.geometryShader << std::endl;
+
+        VkPhysicalDeviceMemoryProperties memoryProperties;
+        vkGetPhysicalDeviceMemoryProperties(*device, &memoryProperties);
+        std::cout << memoryProperties.memoryTypeCount;
+        std::cout << memoryProperties.memoryHeapCount;
+    }
+
+    int main(int argc, char *argv[])
     {
         VkApplicationInfo applicationInfo;
         applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -35,18 +56,22 @@ namespace VulkanPrototype
         instanceCreateInfo.enabledExtensionCount = 0;
         instanceCreateInfo.ppEnabledExtensionNames = nullptr;
 
-        VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr ,&instance);
+        VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
         EvaluteVulkanResult(result);
 
         uint32_t amountOfPhysicalDevices = 0;
         result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, nullptr);
         EvaluteVulkanResult(result);
 
-        VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
+        VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
         result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices);
         EvaluteVulkanResult(result);
 
-        std::cout << amountOfPhysicalDevices << std::endl;
+        for (int i = 0; i < amountOfPhysicalDevices; i++)
+        {
+            printStats(physicalDevices);
+            std::cout << "\n---------------------------------------\n\n";
+        }
 
         return 0;
     }
@@ -55,4 +80,9 @@ namespace VulkanPrototype
 int main(int argc, char *argv[])
 {
     VulkanPrototype::main(argc, argv);
+
+    std::cout << "\nPress Enter to close console: ";
+    getchar();
+
+    return 0;
 }
