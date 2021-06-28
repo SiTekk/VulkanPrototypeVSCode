@@ -11,7 +11,13 @@ namespace VulkanPrototype
     void EvaluteVulkanResult(VkResult result)
     {
         if (result != VK_SUCCESS)
+        {
+#ifdef _WIN32
             __debugbreak();
+#endif
+            std::cout << result;
+        }
+
     }
 
     void printStats(VkPhysicalDevice *device)
