@@ -17,10 +17,9 @@ namespace VulkanPrototype
 #endif
             std::cout << result;
         }
-
     }
 
-    void printStats(VkPhysicalDevice *device)
+    void printPhysicalDeviceStats(VkPhysicalDevice *device)
     {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(*device, &properties);
@@ -33,12 +32,30 @@ namespace VulkanPrototype
 
         VkPhysicalDeviceFeatures features;
         vkGetPhysicalDeviceFeatures(*device, &features);
-        std::cout << features.geometryShader << std::endl;
+        std::cout << "\nGeometry Shader: " << features.geometryShader << std::endl;
 
         VkPhysicalDeviceMemoryProperties memoryProperties;
         vkGetPhysicalDeviceMemoryProperties(*device, &memoryProperties);
-        std::cout << memoryProperties.memoryTypeCount;
-        std::cout << memoryProperties.memoryHeapCount;
+        std::cout << "\nMemory Type Count: " << memoryProperties.memoryTypeCount << std::endl;
+        std::cout << "Memory Heap Count: " << memoryProperties.memoryHeapCount << std::endl;
+
+        uint32_t amountOfQueueFamilies = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(*device, &amountOfQueueFamilies, nullptr);
+        VkQueueFamilyProperties *familyProperties = new VkQueueFamilyProperties[amountOfQueueFamilies];
+        vkGetPhysicalDeviceQueueFamilyProperties(*device, &amountOfQueueFamilies, familyProperties);
+
+        std::cout << "\nAmount of Queue Families: " << amountOfQueueFamilies << std::endl << std::endl;
+
+        for (int i = 0; i < amountOfQueueFamilies; i++)
+        {
+            std::cout << "Queue Family Number: " << i << std::endl;
+            std::cout << "Queue Graphics Bit: " << (familyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) << std::endl;
+            std::cout << "Queue Compute Bit: " << (familyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) << std::endl;
+            std::cout << "Queue Transpher Bit: " << (familyProperties[i].queueFlags & VK_QUEUE_TRANSFER_BIT) << std::endl;
+            std::cout << std::endl;
+        }
+
+        delete familyProperties;
     }
 
     int main(int argc, char *argv[])
@@ -75,9 +92,11 @@ namespace VulkanPrototype
 
         for (int i = 0; i < amountOfPhysicalDevices; i++)
         {
-            printStats(physicalDevices);
+            printPhysicalDeviceStats(physicalDevices);
             std::cout << "\n---------------------------------------\n\n";
         }
+
+        delete physicalDevices;
 
         return 0;
     }
