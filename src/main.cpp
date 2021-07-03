@@ -1,5 +1,5 @@
+#include <cstring>
 #include <iostream>
-#include <vector>
 #include "vulkan/vulkan.h"
 
 #define VULKANPROTOTYPE_VERSION VK_MAKE_VERSION(0, 1, 0)
@@ -21,6 +21,37 @@ namespace VulkanPrototype
         }
     }
 
+    bool checkValidationLayerSupport(uint32_t amountOfValidationLayers,const char * const * ppValidationLayrs)
+    {
+        uint32_t amountOfLayers = 0;
+        VkResult result = vkEnumerateInstanceLayerProperties(&amountOfLayers, nullptr);
+        EvaluteVulkanResult(result);
+        VkLayerProperties *layers = new VkLayerProperties[amountOfLayers];
+        result = vkEnumerateInstanceLayerProperties(&amountOfLayers, layers);
+        EvaluteVulkanResult(result);
+
+        uint32_t count = 0;
+
+        for(uint32_t i = 0; i < amountOfValidationLayers; i++)
+        {
+            for(uint32_t k = 0; k < amountOfLayers; k++)
+            {
+                if(strcmp(ppValidationLayrs[i], layers[k].layerName) == 0)
+                {
+                    count++;
+                    break;
+                }
+            }
+        }
+
+        delete layers;
+
+        if(count != amountOfValidationLayers)
+            return false;
+        else
+            return true;
+    }
+
     int main(int argc, char *argv[])
     {
         VkApplicationInfo applicationInfo;
@@ -32,28 +63,26 @@ namespace VulkanPrototype
         applicationInfo.engineVersion = 0;
         applicationInfo.apiVersion = VK_API_VERSION_1_2;
 
-        uint32_t amountOfLayers = 0;
-        VkResult result = vkEnumerateInstanceLayerProperties(&amountOfLayers, nullptr);
-        EvaluteVulkanResult(result);
-        VkLayerProperties *layers = new VkLayerProperties[amountOfLayers];
-        result = vkEnumerateInstanceLayerProperties(&amountOfLayers, layers);
-        EvaluteVulkanResult(result);
+        uint32_t amountOfValidationLayers = 1;
+        const char * const * validationLayers = new const char*[amountOfValidationLayers] { "VK_LAYER_KHRONOS_validation" };
 
-        const std::vector<const char*> validationLayers = {
-            "VK_LAYER_KHRONOS_validation"
-        };
+        if(!checkValidationLayerSupport(amountOfValidationLayers, validationLayers))
+        {
+            std::cout << "Validation Layer not Supported!\n";
+            return -1;
+        }
 
         VkInstanceCreateInfo instanceCreateInfo;
         instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instanceCreateInfo.pNext = nullptr;
         instanceCreateInfo.flags = 0;
         instanceCreateInfo.pApplicationInfo = &applicationInfo;
-        instanceCreateInfo.enabledLayerCount = validationLayers.size();
-        instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+        instanceCreateInfo.enabledLayerCount = amountOfValidationLayers;
+        instanceCreateInfo.ppEnabledLayerNames = validationLayers;
         instanceCreateInfo.enabledExtensionCount = 0;
         instanceCreateInfo.ppEnabledExtensionNames = nullptr;
 
-        result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
+        VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
         EvaluteVulkanResult(result);
 
         uint32_t amountOfPhysicalDevices = 0;
@@ -98,7 +127,7 @@ namespace VulkanPrototype
 
         delete queuePriorities;
         delete physicalDevices;
-        delete layers;
+        delete validationLayers;
 
         return 0;
     }
