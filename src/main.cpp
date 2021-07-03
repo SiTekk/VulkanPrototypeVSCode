@@ -1,9 +1,7 @@
-#define SDL_MAIN_HANDLED
 #include <cstring>
 #include <iostream>
 #include <vector>
 #include "vulkan/vulkan.h"
-#include "SDL2/SDL.h"
 
 #define VULKANPROTOTYPE_VERSION VK_MAKE_VERSION(0, 1, 0)
 
@@ -67,12 +65,6 @@ namespace VulkanPrototype
 
     int main(int argc, char *argv[])
     {
-        if(SDL_Init(SDL_INIT_VIDEO) !=0)
-        {
-            std::cout << "SDL-Initialisierung fehlgeschlagen!\n";
-            std::cout << SDL_GetError() << std::endl;
-        }
-
         VkApplicationInfo applicationInfo;
         applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         applicationInfo.pNext = nullptr;
