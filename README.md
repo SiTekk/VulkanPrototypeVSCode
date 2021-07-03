@@ -10,4 +10,5 @@ In General: https://code.visualstudio.com/docs/languages/cpp
 ### Versions Used
 Vulkan Version: 1.2.176.1  
 MinGw-w64 Version: 8.1.0
-GCU Version: 9.3.0
+G++ Version: 9.3.0
+SDL Version: 2.0.14-mingw

@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "F:\\Programme\\Vulkan\\1.2.176.1\\Include"
+                "F:\\Programme\\Vulkan\\1.2.176.1\\Include",
+                "F:\\Programme\\SDL\\SDL2-devel-2.0.14-mingw.tar\\SDL2-2.0.14\\x86_64-w64-mingw32\\include"
             ],
             "defines": [
                 "_DEBUG",

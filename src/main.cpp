@@ -1,7 +1,9 @@
+#define SDL_MAIN_HANDLED
 #include <cstring>
 #include <iostream>
 #include <vector>
 #include "vulkan/vulkan.h"
+#include "SDL2/SDL.h"
 
 #define VULKANPROTOTYPE_VERSION VK_MAKE_VERSION(0, 1, 0)
 
@@ -59,10 +61,18 @@ namespace VulkanPrototype
         std::vector<VkExtensionProperties> extensionProperties;
         extensionProperties.resize(amountOfExtensions);
         vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensionProperties.data());
+
+        return true;
     }
 
     int main(int argc, char *argv[])
     {
+        if(SDL_Init(SDL_INIT_VIDEO) !=0)
+        {
+            std::cout << "SDL-Initialisierung fehlgeschlagen!\n";
+            std::cout << SDL_GetError() << std::endl;
+        }
+
         VkApplicationInfo applicationInfo;
         applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         applicationInfo.pNext = nullptr;
@@ -72,12 +82,19 @@ namespace VulkanPrototype
         applicationInfo.engineVersion = 0;
         applicationInfo.apiVersion = VK_API_VERSION_1_2;
 
-
         std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 
         if(!checkValidationLayerSupport(validationLayers))
         {
             std::cout << "Validation Layer not Supported!\n";
+            return -1;
+        }
+
+        std::vector<const char*> usedExtensions = {};
+
+        if(!checkInstanceExtensions())
+        {
+            std::cout << "Extension not Supported!\n";
             return -1;
         }
 
@@ -93,6 +110,9 @@ namespace VulkanPrototype
 
         VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
         EvaluteVulkanResult(result);
+
+        VkSurfaceKHR surface;
+        //vkCreate
 
         uint32_t amountOfPhysicalDevices = 0;
         result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, nullptr);
@@ -115,7 +135,7 @@ namespace VulkanPrototype
         deviceQueueCreateInfo.pNext = nullptr;
         deviceQueueCreateInfo.flags = 0;
         deviceQueueCreateInfo.queueFamilyIndex = 0; //Todo Check for Queue Families
-        deviceQueueCreateInfo.queueCount = 4;
+        deviceQueueCreateInfo.queueCount = 1;
         deviceQueueCreateInfo.pQueuePriorities = queuePriorities.data();
 
         VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
@@ -135,6 +155,9 @@ namespace VulkanPrototype
         //Pick fitting Device
         result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &device);
         EvaluteVulkanResult(result);
+
+        VkQueue queue;
+        vkGetDeviceQueue(device, 0, 0, &queue);
 
         vkDeviceWaitIdle(device);
         vkDestroyDevice(device, nullptr);
