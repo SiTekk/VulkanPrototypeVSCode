@@ -52,6 +52,14 @@ namespace VulkanPrototype
             return true;
     }
 
+    bool checkInstanceExtensions()
+    {
+        uint32_t amountOfExtensions = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, nullptr);
+        VkExtensionProperties *extensionProperties = new VkExtensionProperties[amountOfExtensions];
+        vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensionProperties);
+    }
+
     int main(int argc, char *argv[])
     {
         VkApplicationInfo applicationInfo;
