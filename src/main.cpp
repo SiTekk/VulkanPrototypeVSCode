@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <vector>
 #include "vulkan/vulkan.h"
 
 #define VULKANPROTOTYPE_VERSION VK_MAKE_VERSION(0, 1, 0)
@@ -21,22 +22,23 @@ namespace VulkanPrototype
         }
     }
 
-    bool checkValidationLayerSupport(uint32_t amountOfValidationLayers,const char * const * ppValidationLayrs)
+    bool checkValidationLayerSupport(std::vector<const char*> validationLayers)
     {
         uint32_t amountOfLayers = 0;
         VkResult result = vkEnumerateInstanceLayerProperties(&amountOfLayers, nullptr);
         EvaluteVulkanResult(result);
-        VkLayerProperties *layers = new VkLayerProperties[amountOfLayers];
-        result = vkEnumerateInstanceLayerProperties(&amountOfLayers, layers);
+        std::vector<VkLayerProperties> layers;
+        layers.resize(amountOfLayers);
+        result = vkEnumerateInstanceLayerProperties(&amountOfLayers, layers.data());
         EvaluteVulkanResult(result);
 
         uint32_t count = 0;
 
-        for(uint32_t i = 0; i < amountOfValidationLayers; i++)
+        for(uint32_t i = 0; i < validationLayers.size(); i++)
         {
             for(uint32_t k = 0; k < amountOfLayers; k++)
             {
-                if(strcmp(ppValidationLayrs[i], layers[k].layerName) == 0)
+                if(strcmp(validationLayers[i], layers[k].layerName) == 0)
                 {
                     count++;
                     break;
@@ -44,9 +46,7 @@ namespace VulkanPrototype
             }
         }
 
-        delete layers;
-
-        if(count != amountOfValidationLayers)
+        if(count != validationLayers.size())
             return false;
         else
             return true;
@@ -56,8 +56,9 @@ namespace VulkanPrototype
     {
         uint32_t amountOfExtensions = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, nullptr);
-        VkExtensionProperties *extensionProperties = new VkExtensionProperties[amountOfExtensions];
-        vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensionProperties);
+        std::vector<VkExtensionProperties> extensionProperties;
+        extensionProperties.resize(amountOfExtensions);
+        vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensionProperties.data());
     }
 
     int main(int argc, char *argv[])
@@ -71,10 +72,10 @@ namespace VulkanPrototype
         applicationInfo.engineVersion = 0;
         applicationInfo.apiVersion = VK_API_VERSION_1_2;
 
-        uint32_t amountOfValidationLayers = 1;
-        const char * const * validationLayers = new const char*[amountOfValidationLayers] { "VK_LAYER_KHRONOS_validation" };
 
-        if(!checkValidationLayerSupport(amountOfValidationLayers, validationLayers))
+        std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
+
+        if(!checkValidationLayerSupport(validationLayers))
         {
             std::cout << "Validation Layer not Supported!\n";
             return -1;
@@ -85,8 +86,8 @@ namespace VulkanPrototype
         instanceCreateInfo.pNext = nullptr;
         instanceCreateInfo.flags = 0;
         instanceCreateInfo.pApplicationInfo = &applicationInfo;
-        instanceCreateInfo.enabledLayerCount = amountOfValidationLayers;
-        instanceCreateInfo.ppEnabledLayerNames = validationLayers;
+        instanceCreateInfo.enabledLayerCount = validationLayers.size();
+        instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
         instanceCreateInfo.enabledExtensionCount = 0;
         instanceCreateInfo.ppEnabledExtensionNames = nullptr;
 
@@ -96,16 +97,18 @@ namespace VulkanPrototype
         uint32_t amountOfPhysicalDevices = 0;
         result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, nullptr);
         EvaluteVulkanResult(result);
-        VkPhysicalDevice *physicalDevices = new VkPhysicalDevice[amountOfPhysicalDevices];
-        result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices);
+        std::vector<VkPhysicalDevice> physicalDevices;
+        physicalDevices.resize(amountOfPhysicalDevices);
+        result = vkEnumeratePhysicalDevices(instance, &amountOfPhysicalDevices, physicalDevices.data());
         EvaluteVulkanResult(result);
 
         uint32_t amountOfQueueFamilyProperties = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &amountOfQueueFamilyProperties, nullptr);
-        VkQueueFamilyProperties* queueFamilyProperties = new VkQueueFamilyProperties[amountOfQueueFamilyProperties];
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &amountOfQueueFamilyProperties, queueFamilyProperties);
+        std::vector<VkQueueFamilyProperties> queueFamilyProperties;
+        queueFamilyProperties.resize(amountOfQueueFamilyProperties);
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &amountOfQueueFamilyProperties, queueFamilyProperties.data());
 
-        float *queuePriorities = new float[4] {1.0, 1.0, 1.0, 1.0};
+        std::vector<float> queuePriorities = {1.0, 1.0, 1.0, 1.0};
 
         VkDeviceQueueCreateInfo deviceQueueCreateInfo;
         deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -113,7 +116,7 @@ namespace VulkanPrototype
         deviceQueueCreateInfo.flags = 0;
         deviceQueueCreateInfo.queueFamilyIndex = 0; //Todo Check for Queue Families
         deviceQueueCreateInfo.queueCount = 4;
-        deviceQueueCreateInfo.pQueuePriorities = queuePriorities;
+        deviceQueueCreateInfo.pQueuePriorities = queuePriorities.data();
 
         VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
 
@@ -133,9 +136,9 @@ namespace VulkanPrototype
         result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &device);
         EvaluteVulkanResult(result);
 
-        delete queuePriorities;
-        delete physicalDevices;
-        delete validationLayers;
+        vkDeviceWaitIdle(device);
+        vkDestroyDevice(device, nullptr);
+        vkDestroyInstance(instance, nullptr);
 
         return 0;
     }
