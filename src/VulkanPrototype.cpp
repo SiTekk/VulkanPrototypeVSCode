@@ -29,7 +29,7 @@ namespace VulkanPrototype
         return 0;
     }
 
-    bool VulkanPrototype::checkInstanceExtensions()
+    bool VulkanPrototype::checkInstanceExtensions(uint32_t amountOfGlfwExtensions, const char **requiredGlfwExtensions)
     {
         uint32_t amountOfExtensions = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, nullptr);
@@ -37,7 +37,24 @@ namespace VulkanPrototype
         extensionProperties.resize(amountOfExtensions);
         vkEnumerateInstanceExtensionProperties(nullptr, &amountOfExtensions, extensionProperties.data());
 
-        return true;
+        uint32_t count = 0;
+
+        for (uint32_t i = 0; i < amountOfGlfwExtensions; i++)
+        {
+            for (uint32_t k = 0; k < amountOfExtensions; k++)
+            {
+                if (strcmp(requiredGlfwExtensions[i], extensionProperties[k].extensionName) == 0)
+                {
+                    count++;
+                    break;
+                }
+            }
+        }
+
+        if (count != amountOfGlfwExtensions)
+            return false;
+        else
+            return true;
     }
 
     bool VulkanPrototype::checkValidationLayerSupport(std::vector<const char *> validationLayers)
@@ -72,15 +89,18 @@ namespace VulkanPrototype
 
     int VulkanPrototype::cleanupGlfw()
     {
-        glfwDestroyWindow(window);
+        glfwDestroyWindow(Window);
         return 0;
     }
 
     int VulkanPrototype::cleanupVulkan()
     {
         vkDeviceWaitIdle(Device);
+
         vkDestroyDevice(Device, nullptr);
+        vkDestroySurfaceKHR(Instance, Surface, nullptr);
         vkDestroyInstance(Instance, nullptr);
+
         return 0;
     }
 
@@ -89,7 +109,7 @@ namespace VulkanPrototype
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        window = glfwCreateWindow(xSize, ySize, "VulkanPrototype", nullptr, nullptr);
+        Window = glfwCreateWindow(xSize, ySize, "VulkanPrototype", nullptr, nullptr);
 
         return 0;
     }
@@ -115,7 +135,10 @@ namespace VulkanPrototype
 
         std::vector<const char *> usedExtensions = {};
 
-        if (!checkInstanceExtensions())
+        uint32_t amountOfGlfwExtensions = 0;
+        const char **requiredGlfwExtensions = glfwGetRequiredInstanceExtensions(&amountOfGlfwExtensions);
+
+        if (!checkInstanceExtensions(amountOfGlfwExtensions, requiredGlfwExtensions))
         {
             std::cout << "Extension not Supported!\n";
             return -1;
@@ -128,14 +151,14 @@ namespace VulkanPrototype
         instanceCreateInfo.pApplicationInfo = &applicationInfo;
         instanceCreateInfo.enabledLayerCount = validationLayers.size();
         instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
-        instanceCreateInfo.enabledExtensionCount = 0;
-        instanceCreateInfo.ppEnabledExtensionNames = nullptr;
+        instanceCreateInfo.enabledExtensionCount = amountOfGlfwExtensions;
+        instanceCreateInfo.ppEnabledExtensionNames = requiredGlfwExtensions;
 
         VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &Instance);
         EvaluteVulkanResult(result);
 
-        VkSurfaceKHR surface;
-        //vkCreate
+        result = glfwCreateWindowSurface(Instance, Window, nullptr, &Surface);
+        EvaluteVulkanResult(result);
 
         uint32_t amountOfPhysicalDevices = 0;
         result = vkEnumeratePhysicalDevices(Instance, &amountOfPhysicalDevices, nullptr);
@@ -187,7 +210,7 @@ namespace VulkanPrototype
 
     int VulkanPrototype::mainLoop()
     {
-        while (!glfwWindowShouldClose(window))
+        while (!glfwWindowShouldClose(Window))
         {
             glfwPollEvents();
         }

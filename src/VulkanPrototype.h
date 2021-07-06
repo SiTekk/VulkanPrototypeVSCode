@@ -22,14 +22,14 @@ namespace VulkanPrototype
         void EvaluteVulkanResult(VkResult result);
         int Run();
 
-        GLFWwindow *window;
+        GLFWwindow *Window;
         VkDevice Device;
         VkInstance Instance;
         VkQueue Queue;
         VkSurfaceKHR Surface;
 
     private:
-        bool checkInstanceExtensions();
+        bool checkInstanceExtensions(uint32_t amountOfGlfwExtensions, const char **requiredGlfwExtensions);
         bool checkValidationLayerSupport(std::vector<const char *> validationLayers);
         int cleanupGlfw();
         int cleanupVulkan();
