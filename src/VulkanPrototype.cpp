@@ -4,8 +4,7 @@ namespace VulkanPrototype
 {
     VulkanPrototype::VulkanPrototype()
     {
-        xSize = 1280;
-        ySize = 720;
+        windowSize = {.x = 1280, .y = 720};
     }
 
     void VulkanPrototype::EvaluteVulkanResult(VkResult result)
@@ -109,7 +108,7 @@ namespace VulkanPrototype
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        Window = glfwCreateWindow(xSize, ySize, "VulkanPrototype", nullptr, nullptr);
+        Window = glfwCreateWindow(windowSize.x, windowSize.y, "VulkanPrototype", nullptr, nullptr);
 
         return 0;
     }

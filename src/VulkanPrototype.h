@@ -37,11 +37,16 @@ namespace VulkanPrototype
         int initializeVulkan();
         int mainLoop();
 
+        struct uSize
+        {
+            uint32_t x, y;
+        } windowSize;
+
         // std::vector<VkPhysicalDevice> physicalDevices;
         // std::vector<VkQueueFamilyProperties> queueFamilyProperties;
         // std::vector<float> queuePriorities = {1.0, 1.0, 1.0, 1.0};
 
-        uint32_t xSize, ySize;
+        //uint32_t xSize, ySize;
 
         // VkDeviceCreateInfo deviceCreateInfo;
         // VkDeviceQueueCreateInfo deviceQueueCreateInfo;
