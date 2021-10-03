@@ -1,0 +1,18 @@
+CompilerPath = C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\g++.exe
+CompilerFlags = -std=c++17 -Wall -Wextra
+CompilerRealeaseFlags= -O3
+LibPaths = -LF:\Programme\_Libraries\VulkanSDK\Lib -LF:\Programme\_Libraries\glfw-3.3.4.bin.WIN64\lib-mingw-w64
+IncludePaths = -IF:\Programme\_Libraries\VulkanSDK\Include -IF:\Programme\_Libraries\glfw-3.3.4.bin.WIN64\include
+LinkerFLags = -lvulkan-1 -lglfw3 -lgdi32
+SourceCode = $(wildcard src/*.cpp)
+Executable = F:\Programme\VulkanPrototype\bin\main.exe
+ReleaseExecutable = F:\Programme\VulkanPrototype\bin\release.exe
+
+DebuggingBuild:
+	$(CompilerPath) -g $(CompilerFlags) $(SourceCode) -o $(Executable) $(IncludePaths) $(LibPaths) $(LinkerFLags)
+
+ReleaseBuild:
+	$(CompilerPath) $(CompilerFlags) $(CompilerRealeaseFlags) $(SourceCode) -o $(ReleaseExecutable) $(IncludePaths) $(LibPaths) $(LinkerFLags)
+
+ReleaseBuild:
+	$(CompilerPath) $(CompilerFlags) $(CompilerRealeaseFlags) $(SourceCode) -o $(ReleaseExecutable) -static $(IncludePaths) $(LibPaths) $(LinkerFLags)
